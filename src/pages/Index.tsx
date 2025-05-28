@@ -1,73 +1,19 @@
-import React, { useState } from "react";
+import Header from "@/components/sections/Header";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Icon from "@/components/ui/icon";
+import OrderForm from "@/components/forms/OrderForm";
+import { useTracking } from "@/hooks/useTracking";
+import { servicePlans, contactInfo } from "@/constants/services";
 
 const Index = () => {
-  const [orderData, setOrderData] = useState({
-    fromAddress: "",
-    toAddress: "",
-    phone: "",
-  });
-  const [trackingNumber, setTrackingNumber] = useState("");
-  const [orderSubmitted, setOrderSubmitted] = useState(false);
-
-  const handleOrderSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setOrderSubmitted(true);
-    // Имитация создания заказа
-    setTimeout(() => setOrderSubmitted(false), 3000);
-  };
-
-  const handleTrackingSearch = () => {
-    if (trackingNumber) {
-      alert(`Отслеживание заказа №${trackingNumber}: Заказ в пути`);
-    }
-  };
+  const { trackingNumber, setTrackingNumber, handleTrackingSearch } =
+    useTracking();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <Icon name="Truck" size={32} className="text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-900">
-                БыстроДоставка
-              </h1>
-            </div>
-            <nav className="flex space-x-6">
-              <a
-                href="#services"
-                className="text-gray-600 hover:text-blue-600 transition-colors"
-              >
-                Услуги
-              </a>
-              <a
-                href="#tracking"
-                className="text-gray-600 hover:text-blue-600 transition-colors"
-              >
-                Отслеживание
-              </a>
-              <a
-                href="#contact"
-                className="text-gray-600 hover:text-blue-600 transition-colors"
-              >
-                Контакты
-              </a>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-blue-600 to-blue-500 text-white py-20">
@@ -99,78 +45,7 @@ const Index = () => {
                 </Button>
               </div>
             </div>
-
-            {/* Order Form */}
-            <Card className="bg-white/95 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-gray-900">Быстрый заказ</CardTitle>
-                <CardDescription>Оформите доставку за 2 минуты</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleOrderSubmit} className="space-y-4">
-                  <div>
-                    <Label htmlFor="from">Откуда забрать</Label>
-                    <Input
-                      id="from"
-                      placeholder="Адрес отправления"
-                      value={orderData.fromAddress}
-                      onChange={(e) =>
-                        setOrderData({
-                          ...orderData,
-                          fromAddress: e.target.value,
-                        })
-                      }
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="to">Куда доставить</Label>
-                    <Input
-                      id="to"
-                      placeholder="Адрес доставки"
-                      value={orderData.toAddress}
-                      onChange={(e) =>
-                        setOrderData({
-                          ...orderData,
-                          toAddress: e.target.value,
-                        })
-                      }
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="phone">Телефон</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="+7 (999) 123-45-67"
-                      value={orderData.phone}
-                      onChange={(e) =>
-                        setOrderData({ ...orderData, phone: e.target.value })
-                      }
-                      className="mt-1"
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700"
-                    disabled={orderSubmitted}
-                  >
-                    {orderSubmitted ? (
-                      <>
-                        <Icon name="CheckCircle" size={20} />
-                        Заказ оформлен!
-                      </>
-                    ) : (
-                      <>
-                        <Icon name="Send" size={20} />
-                        Оформить заказ
-                      </>
-                    )}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+            <OrderForm />
           </div>
         </div>
       </section>
@@ -186,7 +61,6 @@ const Index = () => {
               Введите номер заказа для отслеживания
             </p>
           </div>
-
           <Card className="max-w-md mx-auto">
             <CardContent className="pt-6">
               <div className="flex space-x-2">
@@ -219,79 +93,28 @@ const Index = () => {
               Выберите подходящий тариф доставки
             </p>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader className="text-center">
-                <Icon
-                  name="Zap"
-                  size={48}
-                  className="text-orange-500 mx-auto mb-4"
-                />
-                <CardTitle>Экспресс</CardTitle>
-                <CardDescription>Доставка в течение 2 часов</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-gray-900 mb-2">
-                    от 300₽
+            {servicePlans.map((plan) => (
+              <Card key={plan.id} className="hover:shadow-lg transition-shadow">
+                <div className="text-center p-6">
+                  <Icon
+                    name={plan.icon}
+                    size={48}
+                    className={`${plan.color} mx-auto mb-4`}
+                  />
+                  <h4 className="text-xl font-bold mb-2">{plan.name}</h4>
+                  <p className="text-gray-600 mb-4">{plan.description}</p>
+                  <div className="text-3xl font-bold text-gray-900 mb-4">
+                    {plan.price}
                   </div>
                   <ul className="text-sm text-gray-600 space-y-2">
-                    <li>• Доставка за 2 часа</li>
-                    <li>• SMS уведомления</li>
-                    <li>• Приоритетная обработка</li>
+                    {plan.features.map((feature, index) => (
+                      <li key={index}>• {feature}</li>
+                    ))}
                   </ul>
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow border-blue-200">
-              <CardHeader className="text-center">
-                <Icon
-                  name="Clock"
-                  size={48}
-                  className="text-blue-500 mx-auto mb-4"
-                />
-                <CardTitle>Стандарт</CardTitle>
-                <CardDescription>Доставка в течение дня</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-gray-900 mb-2">
-                    от 150₽
-                  </div>
-                  <ul className="text-sm text-gray-600 space-y-2">
-                    <li>• Доставка в день заказа</li>
-                    <li>• Отслеживание онлайн</li>
-                    <li>• Звонок перед доставкой</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader className="text-center">
-                <Icon
-                  name="Calendar"
-                  size={48}
-                  className="text-green-500 mx-auto mb-4"
-                />
-                <CardTitle>Эконом</CardTitle>
-                <CardDescription>Доставка на следующий день</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-gray-900 mb-2">
-                    от 99₽
-                  </div>
-                  <ul className="text-sm text-gray-600 space-y-2">
-                    <li>• Доставка на следующий день</li>
-                    <li>• Базовое отслеживание</li>
-                    <li>• Выгодная цена</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
@@ -303,21 +126,17 @@ const Index = () => {
             Свяжитесь с нами
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="flex flex-col items-center">
-              <Icon name="Phone" size={32} className="text-blue-600 mb-4" />
-              <h4 className="text-lg font-semibold mb-2">Телефон</h4>
-              <p className="text-gray-600">+7 (495) 123-45-67</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <Icon name="Mail" size={32} className="text-blue-600 mb-4" />
-              <h4 className="text-lg font-semibold mb-2">Email</h4>
-              <p className="text-gray-600">info@bistro-delivery.ru</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <Icon name="Clock" size={32} className="text-blue-600 mb-4" />
-              <h4 className="text-lg font-semibold mb-2">Режим работы</h4>
-              <p className="text-gray-600">24/7</p>
-            </div>
+            {contactInfo.map((contact, index) => (
+              <div key={index} className="flex flex-col items-center">
+                <Icon
+                  name={contact.icon}
+                  size={32}
+                  className="text-blue-600 mb-4"
+                />
+                <h4 className="text-lg font-semibold mb-2">{contact.title}</h4>
+                <p className="text-gray-600">{contact.value}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
